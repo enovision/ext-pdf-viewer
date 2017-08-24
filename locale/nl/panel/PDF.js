@@ -1,5 +1,18 @@
 /**
- * Created by j.vd.merwe on 8/24/17.
+ * @copyright   Enovision GmbH
+ * @author      Johan van de Merwe
+ * @licence     MIT-Styled License
+ * @date        31 Jan 2017
+ * @class       PdfViewer.nl.panel.PDF
+ *
  */
 Ext.define('PdfViewer.nl.panel.PDF', {
+    override: 'PdfViewer.panel.PDF',
+
+    loadingMessage: 'PDF wordt geladen, een ogenblik...',
+    beforePageText: 'Pagina',
+    afterPageText: 'van {0}',
+    firstText: 'Eerste pagina',
+    prevText: 'Vorige pagina',
+    nextText: 'Volgende pagina'
 });
