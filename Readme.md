@@ -31,7 +31,7 @@ After that put the following in your app.json:
 
 ### External pdf.js files
 
-This singleton puts dynamically the required pdfjs files in the head of your index.html file.
+This required pdfjs files are automatically loaded in the head of your index.html file (see package.json, `js` section).
 This reduces the effort of adding the tags in this file yourself and it will give no errors
 when creating your own build for the paths are always correctly set.
 
