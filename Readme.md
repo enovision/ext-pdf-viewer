@@ -167,7 +167,7 @@ Initial scale of shown pages, 1 = 100%, 2 = 200% (default:1)
 
 default: 'Page'
 
-#### afterPageText
+#### afterPageText 
 
 default: 'of {0}'
 
