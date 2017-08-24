@@ -1,0 +1,77 @@
+{
+  "name": "ext-pdf-viewer",
+  "namespace": "PdfViewer",
+  "type": "code",
+  "creator": "Johan van de Merwe",
+  "summary": "ExtJS Panel to view PDF files",
+  "detailedDescription": "ExtJS Panel to view PDF files",
+  "version": "1.0.0",
+  "compatVersion": "1.0.0",
+  "format": "1",
+  "slicer": {
+    "js": [
+      {
+        "path": "${package.dir}/sass/example/custom.js",
+        "isWidgetManifest": true
+      }
+    ]
+  },
+  "output": "${package.dir}/build",
+  "local": true,
+  "sass": {
+    "namespace": "Ext.pdf.viewer",
+    "etc": [
+      "${package.dir}/sass/etc/all.scss",
+      "${package.dir}/${toolkit.name}/sass/etc/all.scss"
+    ],
+    "var": [
+      "${package.dir}/sass/var",
+      "${package.dir}/${toolkit.name}/sass/var"
+    ],
+    "src": [
+      "${package.dir}/sass/src",
+      "${package.dir}/${toolkit.name}/sass/src"
+    ]
+  },
+  "classpath": [
+    "${package.dir}/src",
+    "${package.dir}/${toolkit.name}/src"
+  ],
+  "overrides": [
+    "${package.dir}/overrides",
+    "${package.dir}/${toolkit.name}/overrides",
+    "${package.dir}/locale/${package.locale}"
+  ],
+  "example": {
+    "path": [
+      "${package.dir}/examples"
+    ]
+  },
+  "production": {
+    "compressor": {
+      "type": "closure"
+    }
+  },
+  "resources": [
+    {
+      "path": "resources",
+      "output": "shared"
+    }
+  ],
+  "js": [
+    {
+      "path": "resources/lib/pdf.js/build/minified/web/compatibility.js",
+      "includeInBundle": true
+    },
+    {
+      "path": "resources/lib/pdf.js/build/minified/build/pdf.js",
+      "includeInBundle": true
+    },
+    {
+      "path": "resources/lib/pdf.js/build/minified/build/text_layer_builder.js",
+      "includeInBundle": true
+    }
+  ],
+  "css": [],
+  "requires": []
+}
