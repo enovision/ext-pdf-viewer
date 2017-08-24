@@ -135,15 +135,11 @@ Sample:
     });
     
 ### Language independency ###
-In the `locale` folder of this package you will find the singleton that
-holds the text variables. You can add your own locale easily by adding
-another language folder as `de` or `nl` with the same structure.
+In the `locale` folder of this package you will find the objects that
+override the text variables. You can add your own locale easily by adding
+another language folder like `de` or `nl` with the same structure.
     
 ### Config settings ###
-
-If you would like to change the defaults, change them in the singleton, except
-for the language properties that are not part of the `config` object. You can 
-change them in the `locale` folder as mentioned above.
 
 
 #### showPerPage ####
