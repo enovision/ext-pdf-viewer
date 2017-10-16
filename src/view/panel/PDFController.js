@@ -14,6 +14,11 @@ Ext.define('PdfViewer.view.panel.PDFController', {
 
     container: null,
 
+    pageScale: null,
+    zoomFactor: null,
+    minScale: null,
+    maxScale: null,
+
     control: {
         '#': {
             boxready: 'onBoxReady',
@@ -24,12 +29,23 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         }
     },
 
+    init: function (view) {
+        var me = this;
+
+        me.zoomFactor = view.zoomFactor;
+        me.minScale = view.minScale;
+        me.maxScale = view.maxScale;
+        me.pageScale = view.pageScale;
+
+        PDFJS.workerSrc = Ext.getResourcePath('pdf.js/build/pdf.worker.min.js', null, 'ext-pdf-viewer');
+    },
+
     onSetSrc: function (src) {
         var view = this.getView();
         view.src = src;
         view.currentPage = 1; // reset page counter
         this.showLoaderMask(view);
-        return this.getDocument();
+        this.getDocument(src);
     },
 
     /**
@@ -60,14 +76,24 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         me.container.mozOpaque = true;
 
         if (!!view.src) {
-            PDFJS.getDocument(view.src).then(function (pdfDoc) {
-                view.pdfDoc = pdfDoc;
-                me.loadDocument();
-            });
+            me.getDocument(view.src);
         }
     },
 
-    loadDocument: function () {
+    getDocument: function (src) {
+        var me = this;
+        var view = me.getView();
+
+        //var fs = require('fs');
+        //var data = new Uint8Array(fs.readFileSync(src));
+
+        PDFJS.getDocument(src).then(function (pdfDoc) {
+            view.pdfDoc = pdfDoc;
+            me.renderDocument();
+        });
+    },
+
+    renderDocument: function () {
         try {
             var view = this.getView(), isEmpty;
 
@@ -144,22 +170,19 @@ Ext.define('PdfViewer.view.panel.PDFController', {
                         }
                     })
                     .then(function (textContent) {
-                        if (view.disableTextLayer === false) {
 
-                            var textLayerDiv = document.createElement("div");
-                            textLayerDiv.setAttribute("class", "textLayer");
-                            div.appendChild(textLayerDiv);
+                        var textLayerDiv = document.createElement("div");
+                        textLayerDiv.setAttribute("class", "textLayer");
+                        div.appendChild(textLayerDiv);
 
-                            var textLayer = new TextLayerBuilder({
-                                textLayerDiv: textLayerDiv,
-                                pageIndex: page.pageIndex,
-                                viewport: viewport
-                            });
+                        PDFJS.renderTextLayer({
+                            textContent: textContent,
+                            container: textLayerDiv,
+                            viewport: viewport,
+                            pageIndex: page.pageIndex,
+                            textDivs: []
+                        });
 
-                            textLayer.setTextContent(textContent);
-
-                            textLayer.render();
-                        }
                     });
 
                 Ext.resumeLayouts(true);
@@ -269,10 +292,29 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         this.lookup('scaleCombo').setValue(me.pageScale);
     },
 
+    onBtnZoomInClicked: function (b) {
+        var me = this;
+        me.pageScale += me.zoomFactor;
+        if (me.pageScale > me.maxScale) {
+            me.pageScale = me.maxScale;
+        }
+        this.lookup('scaleCombo').setValue(me.pageScale);
+    },
+
+    onBtnZoomOutClicked: function (b) {
+        var me = this;
+        me.pageScale -= me.zoomFactor;
+        if (me.pageScale < me.minScale) {
+            me.pageScale = me.minScale;
+        }
+        this.lookup('scaleCombo').setValue(me.pageScale);
+    },
+
     onScaleChange: function (combo, newValue) {
-        var view = this.getView();
-        view.pageScale = newValue;
-        this.renderPage(view.currentPage);
+        var me = this;
+        var view = me.getView();
+        view.pageScale = me.pageScale = newValue;
+        me.renderPage(view.currentPage);
     },
 
     readPageFromInput: function () {

@@ -59,19 +59,21 @@
     }
   ],
   "js": [
-    {
-      "path": "resources/lib/pdf.js/build/minified/web/compatibility.js",
-      "includeInBundle": true
-    },
-    {
-      "path": "resources/lib/pdf.js/build/minified/build/pdf.js",
-      "includeInBundle": true
-    },
-    {
-      "path": "resources/lib/pdf.js/build/minified/build/text_layer_builder.js",
-      "includeInBundle": true
-    }
+   {
+     "path": "resources/pdf.js/web/compatibility.js",
+     "includeInBundle": true
+   },
+   {
+     "path": "resources/pdf.js/build/pdf.min.js",
+     "includeInBundle": true
+   },
+   {
+     "path": "resources/pdf.js/build/pdf.worker.min.js",
+     "includeInBundle": true
+   }
   ],
   "css": [],
-  "requires": []
+  "requires": [
+    "font-awesome"
+  ]
 }

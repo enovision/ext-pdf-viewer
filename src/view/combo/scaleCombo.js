@@ -8,7 +8,7 @@
  */
 Ext.define('PdfViewer.view.combo.scaleCombo', {
     extend: 'Ext.form.field.ComboBox',
-    xtype: 'pdfviewer_scalecombo',
+    xtype: 'PdfViewerScaleCombo',
 
     requires: [
         'Ext.data.ArrayStore'
@@ -37,5 +37,17 @@ Ext.define('PdfViewer.view.combo.scaleCombo', {
     }),
     valueField: 'scale',
     displayField: 'text',
-    mode: 'local'
+    mode: 'local',
+    listeners: {
+       change: function(cb, newVal) {
+           var record = cb.store.findRecord('scale', newVal);
+           if (record === null) {
+               cb.store.add({
+                   scale: newVal,
+                   text: Math.round(newVal * 100).toString() + '%'
+               });
+           }
+       }
+    }
+
 });

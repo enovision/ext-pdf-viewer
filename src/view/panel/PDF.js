@@ -128,12 +128,26 @@ Ext.define('PdfViewer.view.panel.PDF', {
      */
     showLoadMaskOnInit: null,
     /**
-     * @cfg{string} html
-     * This element is modified in the initComponent function
+     * @cfg{double} zoomFactor
+     * @default 0.1
+     * The factor for zooming (0.1 = 10%)
+     *
      */
-
-
-    html: '<div class="canvasWrapper"></div>',
+    zoomFactor: 0.1,
+    /**
+     * @cfg{double} minScale
+     * @default 0.5
+     * Minimal scale, it doesn't get smaller than this
+     *
+     */
+    minScale: 0.5,
+    /**
+     * @cfg{double} maxScale
+     * @default 4
+     * Maximum scale, it doesn't get larger than this
+     *
+     */
+    maxScale: 4,
 
     initComponent: function () {
         var me = this, dockedItems;
@@ -188,14 +202,24 @@ Ext.define('PdfViewer.view.panel.PDF', {
                 disabled: true,
                 handler: 'moveLast'
             }, '->', {
+                xtype: 'button',
+                iconCls: 'fa fa-search-plus',
+                tooltip: 'Zoom in',
+                handler: 'onBtnZoomInClicked'
+            }, {
                 reference: 'scaleCombo',
-                xtype: 'pdfviewer_scalecombo',
+                xtype: 'PdfViewerScaleCombo',
                 disabled: true,
                 width: me.scaleWidth,
                 listeners: {
                     change: 'onScaleChange',
                     blur: 'onScaleBlur'
                 }
+            }, {
+                xtype: 'button',
+                tooltip: 'Zoom out',
+                iconCls: 'fa fa-search-minus',
+                handler: 'onBtnZoomOutClicked'
             }]
         }];
 
@@ -204,6 +228,7 @@ Ext.define('PdfViewer.view.panel.PDF', {
         }
 
         Ext.apply(me, {
+            html: '<div class="canvasWrapper"></div>',
             dockedItems: dockedItems
         });
 
