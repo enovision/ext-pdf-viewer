@@ -56,7 +56,7 @@ docking items with your panel definition.
 Sample:
     
     {
-        xtype: 'pdfviewer_panel',
+        xtype: 'PdfViewerPdfPanel',
         layout: 'fit',
         title: 'Viewer',
         bodyPadding: 20,
@@ -86,7 +86,7 @@ Sample:
 
     items: [{
         title: 'Viewer',
-        xtype: 'pdfviewer_panel',
+        xtype: 'PdfViewerPdfPanel',
         layout: 'fit',
         src: '/data/sample2.pdf'
     },
@@ -95,7 +95,7 @@ Sample:
 #### Usage 2 (as xtype, no document load) ####
 
     items: [{
-        xtype: 'pdfviewer_panel',     // xtype
+        xtype: 'PdfViewerPdfPanel',   // xtype
         layout: 'fit',                // layout           
         title: 'Viewer',              // title
         bodyPadding: 20,              // bodyPadding, default no padding !!!

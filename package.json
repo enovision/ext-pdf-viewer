@@ -60,15 +60,15 @@
   ],
   "js": [
    {
-     "path": "resources/pdf.js/web/compatibility.js",
+     "path": "resources/lib/pdf.js/build/minified/web/compatibility.js",
      "includeInBundle": true
    },
    {
-     "path": "resources/pdf.js/build/pdf.min.js",
+     "path": "resources/lib/pdf.js/build/minified/build/pdf.js",
      "includeInBundle": true
    },
    {
-     "path": "resources/pdf.js/build/pdf.worker.min.js",
+     "path": "resources/lib/pdf.js/build/minified/build/pdf.worker.js",
      "includeInBundle": true
    }
   ],
