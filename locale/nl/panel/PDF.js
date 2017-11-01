@@ -7,7 +7,7 @@
  *
  */
 Ext.define('PdfViewer.nl.panel.PDF', {
-    override: 'PdfViewer.panel.PDF',
+    override: 'PdfViewer.view.panel.PDF',
 
     loadingMessage: 'PDF wordt geladen, een ogenblik...',
     beforePageText: 'Pagina',

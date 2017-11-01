@@ -7,7 +7,7 @@
  *
  */
 Ext.define('PdfViewer.de.panel.PDF', {
-    override: 'PdfViewer.panel.PDF',
+    override: 'PdfViewer.view.panel.PDF',
 
     loadingMessage: 'PDF ladet, ein Moment bitte...',
     beforePageText: 'Seite',

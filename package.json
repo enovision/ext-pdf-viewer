@@ -47,31 +47,41 @@
       "${package.dir}/examples"
     ]
   },
-  "production": {
-    "compressor": {
-      "type": "closure"
-    }
-  },
   "resources": [
     {
       "path": "resources",
       "output": "shared"
     }
   ],
-  "js": [
-   {
-     "path": "resources/lib/pdf.js/build/minified/web/compatibility.js",
-     "includeInBundle": true
-   },
-   {
-     "path": "resources/lib/pdf.js/build/minified/build/pdf.js",
-     "includeInBundle": true
-   },
-   {
-     "path": "resources/lib/pdf.js/build/minified/build/pdf.worker.js",
-     "includeInBundle": true
-   }
-  ],
+  "production": {
+    "js": [
+      {
+        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/compatibility.js",
+        "remote": true
+      },
+      {
+        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/pdf.js",
+        "remote": true
+      },
+      {
+        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/pdf.worker.js",
+        "remote": true
+      }
+    ]
+  },
+  "development": {
+    "js": [
+      {
+        "path": "resources/lib/pdf.js/minified/compatibility.js"
+      },
+      {
+        "path": "resources/lib/pdf.js/minified/pdf.js"
+      },
+      {
+        "path": "resources/lib/pdf.js/minified/pdf.worker.js"
+      }
+    ]
+  },
   "css": [],
   "requires": [
     "font-awesome"

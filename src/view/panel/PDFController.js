@@ -37,7 +37,7 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         me.maxScale = view.maxScale;
         me.pageScale = view.pageScale;
 
-        PDFJS.workerSrc = Ext.getResourcePath('pdf.js/build/pdf.worker.min.js', null, 'ext-pdf-viewer');
+        PDFJS.workerSrc = Ext.getResourcePath('lib/pdf.js/minified/pdf.worker.js', null, 'ext-pdf-viewer');
     },
 
     onSetSrc: function (src) {
