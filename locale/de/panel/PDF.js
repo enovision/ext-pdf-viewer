@@ -9,10 +9,11 @@
 Ext.define('PdfViewer.de.panel.PDF', {
     override: 'PdfViewer.view.panel.PDF',
 
-    loadingMessage: 'PDF ladet, ein Moment bitte...',
+    loadingMessage: 'PDF lädt, einen Moment bitte...',
     beforePageText: 'Seite',
     afterPageText: 'von {0}',
     firstText: 'Erste Seite',
+    lastText: 'Letzte Seite',
     prevText: 'Vorherige Seite',
     nextText: 'Nächste Seite'
 });
