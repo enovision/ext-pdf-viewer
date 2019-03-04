@@ -32,7 +32,8 @@ Ext.define('PdfViewer.view.combo.scaleCombo', {
             [1, '100%'],
             [1.25, '125%'],
             [1.5, '150%'],
-            [2, '200%']
+            [2, '200%'],
+            ['fitwidth', 'Fit Width']
         ]
     }),
     valueField: 'scale',

@@ -5,7 +5,7 @@
   "creator": "Johan van de Merwe",
   "summary": "ExtJS Panel to view PDF files",
   "detailedDescription": "ExtJS Panel to view PDF files",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "compatVersion": "1.0.0",
   "format": "1",
   "slicer": {
@@ -56,10 +56,6 @@
   "production": {
     "js": [
       {
-        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/compatibility.js",
-        "remote": true
-      },
-      {
         "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/pdf.js",
         "remote": true
       },
@@ -72,13 +68,10 @@
   "development": {
     "js": [
       {
-        "path": "resources/lib/pdf.js/minified/compatibility.js"
+        "path": "resources/lib/pdf.js/build/pdf.js"
       },
       {
-        "path": "resources/lib/pdf.js/minified/pdf.js"
-      },
-      {
-        "path": "resources/lib/pdf.js/minified/pdf.worker.js"
+        "path": "resources/lib/pdf.js/build/pdf.worker.js"
       }
     ]
   },
