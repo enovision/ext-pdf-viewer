@@ -24,7 +24,6 @@ Ext.define('PdfViewer.view.panel.PDFController', {
             boxready: 'onBoxReady',
             onSetSrc: 'onSetSrc',
             onUnset: 'onUnset',
-            onGetDocument: 'onGetDocument',
             afterrender: 'onAfterrender'
         }
     },
@@ -36,12 +35,24 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         me.minScale = view.minScale;
         me.maxScale = view.maxScale;
         me.pageScale = view.pageScale;
-
-        PDFJS.workerSrc = Ext.getResourcePath('lib/pdf.js/minified/pdf.worker.js', null, 'ext-pdf-viewer');
     },
 
     onSetSrc: function (src) {
         var view = this.getView();
+
+        if (!Ext.isObject(src)) {
+            src = {
+                url: src
+            };
+        }
+
+        //mark previous request which might be still in progress as cancelled
+        if (view.src) {
+            view.src.isCancelled = true;
+            //<debug>
+            console.log(Ext.String.format('[PDFController] Marking previous request for src="{0}" as cancelled', view.src.url));
+            //</debug>
+        }
         view.src = src;
         view.currentPage = 1; // reset page counter
         this.showLoaderMask(view);
@@ -56,10 +67,6 @@ Ext.define('PdfViewer.view.panel.PDFController', {
             this.container.innerHTML = '';
             this.setToolbarProperties(0, true);
         }
-    },
-
-    onGetDocument: function () {
-        this.getDocument();
     },
 
     onBoxReady: function () {
@@ -83,40 +90,78 @@ Ext.define('PdfViewer.view.panel.PDFController', {
     getDocument: function (src) {
         var me = this;
         var view = me.getView();
+        var options = {
+            scrollbarWidth: me.getScrollbarWidth(view)
+        };
 
-        //var fs = require('fs');
-        //var data = new Uint8Array(fs.readFileSync(src));
+        if (Ext.isObject(src)) {
+            options = Ext.apply(src, options);
+        } else {
+            options.url = src;
+        }
 
-        PDFJS.getDocument(src).then(function (pdfDoc) {
-            view.pdfDoc = pdfDoc;
-            me.renderDocument();
+        //<debug>
+        console.log(Ext.String.format('[PDFController] Requesting document src="{0}"', options.url));
+        //</debug>
+
+        pdfjsLib.getDocument(options).then(function getDocumentSuccess(pdfDoc) {
+            if (!options.isCancelled) {
+                view.pdfDoc = options.pdfDoc = pdfDoc;
+                me.renderDocument(options);
+            }
+            else {
+                console.log(Ext.String.format('[PDFController] Skipping rendering of src="{0}" (isCancelled=true)', options.url));
+            }
+        }, function getDocumentError(reason) {
+            console.error(Ext.String.format('Error loading PDF (src="{0}"): {1}', options.url, reason));
+            if (view.loader) {
+                view.loader.destroy();
+            }
+
+            //clear the panel
+            me.onUnset();
+
+            //call passed "errorHandler" or show alert
+            if (Ext.isFunction(options.errorHandler)) {
+                options.errorHandler.call(options, me, reason);
+            } else {
+                Ext.Msg.show({
+                    title: 'PDF preview error',
+                    message: 'Could not preview PDF: ' + reason,
+                    buttons: Ext.MessageBox.OK,
+                    icon: Ext.MessageBox.ERROR
+                });
+            }
         });
     },
 
-    renderDocument: function () {
+    renderDocument: function (options) {
         try {
-            var view = this.getView(), isEmpty;
+            var view = this.getView(),
+                isEmpty = options.pdfDoc.numPages === 0;
 
-            isEmpty = view.pdfDoc.numPages === 0;
             view.currentPage = view.currentPage || (isEmpty ? 0 : 1);
-
-            this.renderPage(view.currentPage);
+            this.renderPage(view.currentPage, options);
         }
         catch (error) {
             Ext.log({level: "warning"}, "PDF: Can't render: " + error.message);
         }
     },
 
-    renderPage: function (page) {
+    renderPage: function (page, options) {
         var me = this,
             view = me.getView(),
-            isEmpty, pageCount,
-            currPage, afterText;
+            pageCount,
+            currPage;
 
-        if (view.isRendering) {
+        if (view.isRendering || !options.pdfDoc) {
             return;
         }
 
+        //<debug>
+        console.log(Ext.String.format('[PDFController] Start rendering src="{0}"', options.url));
+        //</debug>
+        options = options || {};
         view.isRendering = true;
         view.currentPage = page;
 
@@ -131,12 +176,45 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         var numPages = view.showPerPage ? page : pageCount;
         var idx = view.showPerPage ? page : 1;
 
+        function cleanUpRendering() {
+            Ext.resumeLayouts(true);
+
+            view.isRendering = false;
+
+            if (view.loader) {
+                view.loader.destroy();
+                view.loader = null;
+            }
+        }
+
         for (var i = idx; i <= numPages; i++) {
+            if (options.isCancelled) {
+                console.log(Ext.String.format('[PDFController] Skipping rendering of src="{0}" (isCancelled=true, for loop)', options.url));
+                cleanUpRendering();
+                break;
+            }
 
             // Using promise to fetch the page
             view.pdfDoc.getPage(i).then(function (page) {
+                //<debug>
+                console.log(Ext.String.format('[PDFController] Rendering page {0} of src="{1}", (isCancelled={2})', page.pageNumber, options.url, !!options.isCancelled));
+                //</debug>
+                if (options.isCancelled) {
+                    console.log(Ext.String.format('[PDFController] Skipping rendering of src="{0}" (isCancelled=true, getPage promise)', options.url));
+                    cleanUpRendering();
+                    return;
+                }
 
-                var viewport = page.getViewport(view.pageScale);
+                var viewport;
+                
+                if (view.pageScale !== 'fitwidth') {
+                    viewport = page.getViewport(view.pageScale);
+                } else {
+                    //calculate new scale that will fit current view's width
+                    viewport = page.getViewport(1);
+                    var newScale = view.getWidth() / (viewport.width + (options.scrollbarWidth ? options.scrollbarWidth : 0));
+                    viewport = page.getViewport(newScale);
+                }
 
                 var div = document.createElement("div");
                 var id = view.getId() + "-page-" + (page.pageIndex + 1);
@@ -163,35 +241,27 @@ Ext.define('PdfViewer.view.panel.PDFController', {
                     viewport: viewport
                 };
 
-                page.render(renderContext)
-                    .then(function () {
-                        if (view.disableTextLayer === false) {
-                            return page.getTextContent();
-                        }
-                    })
-                    .then(function (textContent) {
+                var renderTask = page.render(renderContext);
 
-                        var textLayerDiv = document.createElement("div");
-                        textLayerDiv.setAttribute("class", "textLayer");
-                        div.appendChild(textLayerDiv);
+                if (!view.disableTextLayer) {
+                    renderTask.promise
+                        .then(function () {
+                            var textContent = page.getTextContent();
+                            var textLayerDiv = document.createElement("div");
+                            textLayerDiv.setAttribute("class", "textLayer");
+                            div.appendChild(textLayerDiv);
 
-                        PDFJS.renderTextLayer({
-                            textContent: textContent,
-                            container: textLayerDiv,
-                            viewport: viewport,
-                            pageIndex: page.pageIndex,
-                            textDivs: []
+                            pdfjsLib.renderTextLayer({
+                                textContent: textContent,
+                                container: textLayerDiv,
+                                viewport: viewport,
+                                pageIndex: page.pageIndex,
+                                textDivs: []
+                            });    
                         });
-
-                    });
-
-                Ext.resumeLayouts(true);
-
-                view.isRendering = false;
-
-                if (view.loader) {
-                    view.loader.destroy();
                 }
+
+                cleanUpRendering();
 
                 if (view.rendered) {
                     me.updateBorder(view.body, id, 'bordered', 'add');
@@ -310,11 +380,33 @@ Ext.define('PdfViewer.view.panel.PDFController', {
         this.lookup('scaleCombo').setValue(me.pageScale);
     },
 
+    getRenderPageOptions: function() {
+        var me = this,
+            view = me.getView();
+        
+        return Ext.apply(view.src, {
+            scrollbarWidth: me.getScrollbarWidth(view)
+        });
+    },
+
     onScaleChange: function (combo, newValue) {
         var me = this;
         var view = me.getView();
         view.pageScale = me.pageScale = newValue;
-        me.renderPage(view.currentPage);
+
+        if (view.pdfDoc) {
+            me.renderPage(view.currentPage, me.getRenderPageOptions());
+        }
+    },
+
+    /**
+     * Tries to determine current width of scrollbar which is then used to calculate
+     * scale more accurately for "fitwidth" scale option.
+     * 
+     * @param {PdfViewer.view.panel.PDF} view 
+     */
+    getScrollbarWidth: function(view) {
+        return !(view && view.getPdfEl()) ? 0 : view.getWidth() - view.getPdfEl().clientWidth;
     },
 
     readPageFromInput: function () {
@@ -334,7 +426,7 @@ Ext.define('PdfViewer.view.panel.PDFController', {
             var me = this,
                 view = me.getView(),
                 currPage = page,
-                pageCount = view.pdfDoc.numPages,
+                pageCount = view.pdfDoc ? view.pdfDoc.numPages : NaN,
                 isEmpty = pageCount === 0,
                 afterText = Ext.String.format(view.afterPageText, isNaN(pageCount) ? 1 : pageCount);
 
@@ -356,7 +448,7 @@ Ext.define('PdfViewer.view.panel.PDFController', {
             var me = this;
             var view = me.getView();
             if (view.showPerPage) {
-                me.renderPage(page);
+                me.renderPage(page, me.getRenderPageOptions());
             } else {
                 me.setToolbarProperties(page);
                 var el = me.container.childNodes.item(page - 1);
@@ -364,6 +456,11 @@ Ext.define('PdfViewer.view.panel.PDFController', {
             }
         },
         showLoaderMask: function (view) {
+            //hide any previous loader
+            if (view.loader) {
+                view.loader.destroy();
+            }
+
             view.loader = new Ext.LoadMask({
                 msg: view.loadingMessage,
                 target: view

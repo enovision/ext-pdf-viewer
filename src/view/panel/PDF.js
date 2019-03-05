@@ -57,6 +57,7 @@ Ext.define('PdfViewer.view.panel.PDF', {
     /**
      * @cfg{Boolean} disableWorker
      * @default false
+     * @deprecated
      * Disable workers to avoid yet another cross-origin issue(workers need the URL of
      * the script to be loaded, and currently do not allow cross-origin scripts)
      */
@@ -238,11 +239,14 @@ Ext.define('PdfViewer.view.panel.PDF', {
         me.cls = me.cls || '';
         me.cls += (' ' + me.extraBaseCls);
 
-        me.callParent(arguments);
+        //when our view gets resized - render again if we have scale set to "fitwidth"
+        me.on('resize', function(comp, width) {
+            if (!me.isRendering && (me.pageScale === 'fitwidth')) {
+                this.getController().onScaleChange(null, me.pageScale);
+            }
+        });
 
-        if (me.disableWorker) {
-            PDFJS.disableWorker = true;
-        }
+        me.callParent(arguments);
     },
 
     getPdfEl: function () {
