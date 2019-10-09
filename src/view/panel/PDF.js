@@ -13,6 +13,10 @@ Ext.define('PdfViewer.view.panel.PDF', {
     xtype: 'PdfViewerPdfPanel',
 
     requires: [
+        'Ext.button.Button',
+        'Ext.toolbar.Fill',
+        'Ext.toolbar.Separator',
+        'Ext.toolbar.TextItem',
         'PdfViewer.view.combo.scaleCombo',
         'PdfViewer.view.field.pageNumber',
         'PdfViewer.view.panel.PDFController'

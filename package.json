@@ -1,13 +1,22 @@
 {
   "name": "ext-pdf-viewer",
   "namespace": "PdfViewer",
-  "type": "code",
-  "creator": "Johan van de Merwe",
+  "format": "1",
+  "version": "1.0.3",
+  "creator": "enovision",
   "summary": "ExtJS Panel to view PDF files",
   "detailedDescription": "ExtJS Panel to view PDF files",
-  "version": "1.0.0",
-  "compatVersion": "1.0.0",
-  "format": "1",
+  "type": "code",
+  "requires": [
+    "font-awesome"
+  ],
+  "css": [],
+  "resources": [
+    {
+      "path": "resources",
+      "output": "shared"
+    }
+  ],
   "slicer": {
     "js": [
       {
@@ -16,8 +25,10 @@
       }
     ]
   },
+  "framework": "ext",
+  "toolkit": "classic",
+  "theme": "ext-theme-classic",
   "output": "${package.dir}/build",
-  "local": true,
   "sass": {
     "namespace": "Ext.pdf.viewer",
     "etc": [
@@ -47,13 +58,13 @@
       "${package.dir}/examples"
     ]
   },
-  "resources": [
-    {
-      "path": "resources",
-      "output": "shared"
-    }
-  ],
   "production": {
+    "css": [
+      {
+        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/text_layer_builder.css",
+        "remote": true
+      }
+    ],
     "js": [
       {
         "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/compatibility.js",
@@ -64,15 +75,27 @@
         "remote": true
       },
       {
+        "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/text_layer_builder.js",
+        "remote": true
+      },
+      {
         "path": "resources/ext-pdf-viewer/lib/pdf.js/minified/pdf.worker.js",
         "remote": true
       }
     ]
   },
   "development": {
+    "css": [
+      {
+        "path": "resources/lib/pdf.js/minified/text_layer_builder.css"
+      }
+    ],
     "js": [
       {
         "path": "resources/lib/pdf.js/minified/compatibility.js"
+      },
+      {
+        "path": "resources/lib/pdf.js/minified/text_layer_builder.js"
       },
       {
         "path": "resources/lib/pdf.js/minified/pdf.js"
@@ -81,9 +104,5 @@
         "path": "resources/lib/pdf.js/minified/pdf.worker.js"
       }
     ]
-  },
-  "css": [],
-  "requires": [
-    "font-awesome"
-  ]
+  }
 }

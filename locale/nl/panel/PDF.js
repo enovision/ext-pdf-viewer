@@ -13,7 +13,6 @@ Ext.define('PdfViewer.nl.panel.PDF', {
     beforePageText: 'Pagina',
     afterPageText: 'van {0}',
     firstText: 'Eerste pagina',
-    lastText: 'Laatste pagina',
     prevText: 'Vorige pagina',
     nextText: 'Volgende pagina'
 });
